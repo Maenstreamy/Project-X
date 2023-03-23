@@ -1,9 +1,10 @@
 export default class Brick {
-    width: Number = 12
-    heigth: Number = 8
-    color: String;
+    width: number = 24
+    heigth: number = 16
+    gap: number = 2
+    // color: String;
     
-    constructor(color: String) {
-        this.color = color
+    constructor() {
+        // this.color = color
     }
 }
