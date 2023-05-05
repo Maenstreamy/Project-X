@@ -2,15 +2,15 @@ export default class Level {
     structure: Array<Array<string>>;
     colorMap: any
 
-    constructor(context: CanvasRenderingContext2D,array: Array<Array<string>>) {
+    constructor(array: Array<Array<string>>) {
         this.structure = array
         this.colorMap = {
-            R: 'red',
-            O: 'orange',
-            G: 'green',
-            Y: 'yellow',
-            // '': 'transparent'
+            R: 'element_red_rectangle_glossy',
+            G: 'element_green_rectangle_glossy',
+            Y: 'element_yellow_rectangle_glossy',
+            P: 'element_purple_rectangle_glossy',
+            S: 'element_silver_rectangle_glossy',
+            B: 'element_blue_rectangle_glossy'
         }
-        console.log(context)
     }
 }

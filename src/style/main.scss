@@ -1,19 +1,71 @@
+@font-face {
+    font-family: "Karmatic Arcade Font";
+    font-style: normal;
+    font-weight: 400;
+    src: local("Karmatic Arcade Font"),
+         url("/assets/fonts/ka1.ttf") format("truetype"),
+  }
+
 html {
     height: 100%;
 }
 
 body {
+    font-family: "Karmatic Arcade Font";
     padding: 0;
     margin: 0;
     display: flex;
     align-items: center;
     justify-content: center;
     height: 100%;
-    background-color: #1E90FF;
+    background-color: #324454;
 }
 
 .game-field {
-    width: 600px;
-    height: 600px;
-    background-color: #00BFFF;
+    width: 1012px;
+    height: 800px;
+    background-color: #1e3454;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.menu {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 16px;
+    font-size: 36px;
+}
+.title {
+    position: absolute;
+    top: -200px;
+    left: 50%;
+    transform: translate(-50%, 0);
+    font-size: 72px;
+    letter-spacing: 7px;
+    color: #cc4c44;
+    pointer-events: none;
+}
+.menu-item {
+    width: 450px;
+    height: 70px;
+    padding: 2px 20px;
+    display: flex;
+    align-items: center;
+    border: 2px #d05e6c solid;
+    color: #d05e6c;
+    border-radius: 16px;
+    cursor: pointer;
+    letter-spacing: 3px;
+    
+    &--select {
+        background-color: #d05e6c;
+        color: white;
+    }
+}
+canvas {
+    display: none;
 }

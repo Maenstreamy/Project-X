@@ -1,5 +1,5 @@
 export default class Brick {
-    width: number = 24
-    heigth: number = 16
+    width: number = 64
+    heigth: number = 32
     gap: number = 2
 }
