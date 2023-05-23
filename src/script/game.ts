@@ -352,8 +352,6 @@ export default class Game {
     });
   }
   loop() {
-    console.log(this.levelScore)
-    console.log(this.totalScore)
     requestAnimationFrame(() => this.loop());
     if (this.gameModeIndex !== 0 && this.gameModeIndex !== 4) {
       this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
