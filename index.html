@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ARCANOID</title>
+    <script type="module" crossorigin src="/assets/index-07f9b5a1.js"></script>
+    <link rel="stylesheet" href="/assets/index-caeee74f.css">
+  </head>
+  <body>
+    <div id="app">
+        <div class="game-field">
+          <div class="menu">
+            <h2 class="title">ARCANOID</h2>
+          </div>
+          <div class="game-over-wrap">
+            <img class="game-over-gif" src="./../assets/img/gameover.gif" alt="">
+            <div class="game-over-winner">YOU WON</div>
+            <div class="game-over-score">
+              <div class="game-over-score__item">Level Score<span id="level-score">0</span></div>
+              <div class="game-over-score__item">Total Score: <span id="total-score">0</span></div>
+            </div>
+            <div class="game-over-menu"></div>
+          </div>
+          <canvas width="1012" height="800" id="game"></canvas>
+        </div>
+    </div>
+    
+  </body>
+</html>
