@@ -11,10 +11,15 @@
         <div class="game-field">
           <div class="menu">
             <h2 class="title">ARCANOID</h2>
-            <!-- <div class="menu-item">Normal</div>
-            <div class="menu-item">RandomMode</div>
-            <div class="menu-item">UltraHardMode</div>
-            <div class="menu-item">Exit</div> -->
+          </div>
+          <div class="game-over-wrap">
+            <img class="game-over-gif" src="./../assets/img/gameover.gif" alt="">
+            <div class="game-over-winner">YOU WON</div>
+            <div class="game-over-score">
+              <div class="game-over-score__item">Level Score<span id="level-score">0</span></div>
+              <div class="game-over-score__item">Total Score: <span id="total-score">0</span></div>
+            </div>
+            <div class="game-over-menu"></div>
           </div>
           <canvas width="1012" height="800" id="game"></canvas>
         </div>

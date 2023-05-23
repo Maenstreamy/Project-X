@@ -17,7 +17,11 @@ export default class Game {
   currentLevel: number = 1;
   sprites: any;
   gameModeIndex: number = 0;
+  selectGameMode: number = 1;
   menu: any;
+  gameOverMenu: any;
+  totalScore: number = 0;
+  levelScore: number = 0;
 
   constructor() {
     this.sprites = {
@@ -29,7 +33,7 @@ export default class Game {
     this.canvas = document.querySelector("canvas") as HTMLCanvasElement;
     this.context = this.canvas.getContext("2d") as CanvasRenderingContext2D;
     window.addEventListener("keydown", (e: KeyboardEvent) => {
-      if (e.which === 32 && this.gameModeIndex === 1) {
+      if (e.which === 32 && this.gameModeIndex !== 0 && this.gameModeIndex !== 4) {
         this.gameStatus = true;
         this.ball.move();
       }
@@ -42,27 +46,11 @@ export default class Game {
 
       if (!this.gameStatus) {
         e.preventDefault();
-        if (e.which === 32 && this.menuItems[this.selectIndex].select) {
-          this.menuItems[this.selectIndex].event();
+        if (this.gameModeIndex === 0) {
+          this.keyDownHandler(e, this.menuItems);
         }
-        if (e.which === 83 || e.which === 87) {
-          if (this.selectIndex === null) {
-            this.selectIndex = 0;
-          } else {
-            if (e.which === 83) {
-              if (this.selectIndex >= this.menuItems.length - 1) return;
-              this.selectIndex++;
-            } else {
-              if (this.selectIndex <= 0) return;
-              this.selectIndex--;
-            }
-          }
-          this.menuItems.forEach((el) => {
-            el.select = false;
-            this.checkSelect(el);
-          });
-          this.menuItems[this.selectIndex].select = true;
-          this.checkSelect(this.menuItems[this.selectIndex]);
+        if (this.gameModeIndex === 4) {
+          this.keyDownHandler(e, this.gameOverList);
         }
       }
     });
@@ -70,16 +58,59 @@ export default class Game {
     this.initLevel();
     this.loop();
   }
+  keyDownHandler(e: KeyboardEvent, items: any) {
+    const deselect = () => {
+      items.forEach((el: any) => {
+        el.select = false;
+        this.checkSelect(el);
+      });
+    };
+    if (e.which === 32 && items[this.selectIndex].select) {
+      items[this.selectIndex].event();
+      deselect();
+    }
+    if (e.which === 83 || e.which === 87) {
+      if (e.which === 83) {
+        if (this.selectIndex === null) {
+          this.selectIndex = 0;
+        } else {
+          if (this.selectIndex >= items.length - 1) return;
+          this.selectIndex++;
+        }
+      } else {
+        if (this.selectIndex === null) {
+          this.selectIndex = items.length - 1;
+        } else {
+          if (this.selectIndex <= 0) return;
+          this.selectIndex--;
+        }
+      }
+
+      deselect();
+      items[this.selectIndex].select = true;
+      this.checkSelect(items[this.selectIndex]);
+    }
+  }
 
   changeGameMode(gameModeIndex: number) {
+    this.currentLevel = 1
+    this.selectIndex = null;
     this.gameModeIndex = gameModeIndex;
+    if (this.gameOverMenu) {
+      this.gameOverMenu.style.display = "none";
+    }
     if (gameModeIndex === 0) {
       this.canvas.style.display = "none";
       this.menu.style.display = "flex";
+    } else if (gameModeIndex === 4) {
+      this.gameOverMenu.style.display = "flex";
     } else {
+      this.selectGameMode = gameModeIndex
       this.canvas.style.display = "block";
       this.menu.style.display = "none";
+      this.gameOverMenu.style.display = "none";
     }
+
     this.gameStatus = false;
   }
   checkSelect = (item: any) => {
@@ -94,22 +125,25 @@ export default class Game {
       name: "Normal",
       event: () => {
         this.changeGameMode(1);
+        this.initLevel();
       },
       select: false,
       el: null,
     },
     {
-      name: "RandomMode",
+      name: "Random Level",
       event: () => {
-        console.log("RandomMode");
+        this.changeGameMode(2);
+        this.initLevel();
       },
       select: false,
       el: null,
     },
     {
-      name: "UltraHardMode",
+      name: "Hard Mode",
       event: () => {
-        console.log("UltraHardMode");
+        this.changeGameMode(3);
+        this.initLevel();
       },
       select: false,
       el: null,
@@ -121,47 +155,61 @@ export default class Game {
       el: null,
     },
   ];
+  gameOverList = [
+    {
+      name: "Try Again",
+      event: () => {
+        this.currentLevel = 1
+        this.changeGameMode(this.selectGameMode);
+        this.initLevel();
+      },
+    },
+    {
+      name: "Main Menu",
+      event: () => this.changeGameMode(0),
+    },
+  ];
   selectIndex: any = null;
   initMenu() {
     this.menu = document.querySelector(".menu") as HTMLElement;
-    this.menuItems.forEach((item: any, index: number) => {
-      item.el = document.createElement("div");
-      item.el.innerHTML = item.name;
-      item.el.classList.add("menu-item");
-      item.el.addEventListener("click", () => {
-        item.event();
-      });
+    this.menuHandler(this.menu, this.menuItems);
 
-      const setSelect = (val: boolean) => {
-        this.menuItems[index].select = val;
-      };
-      const eventHandler = (val: boolean) => {
-        this.menuItems.forEach((el) => {
-          el.select = false;
-          this.checkSelect(el);
-        });
-        if (val) {
-          this.selectIndex = index;
+    this.gameOverMenu = document.querySelector(".game-over-wrap");
+    document.querySelector(".game-field")?.appendChild(this.gameOverMenu);
+    const gameOverMenu = document.querySelector(".game-over-menu");
+    this.menuHandler(gameOverMenu, this.gameOverList, true);
+  }
+
+  randomLevel() {
+    const randomCount = 15
+    function getRandomInt(max: number) {
+      return Math.floor(Math.random() * max);
+    }
+    const randomLevel = []
+
+    const colorList = Object.keys(this.level.colorMap)
+    let randomRow: string[] = []
+    for (let i = 0; i <= getRandomInt(randomCount); i++) {
+      for (let i = 0; i < randomCount; i++) {
+        if(getRandomInt(colorList.length + 3) > colorList.length) {
+          randomRow.push('')
         } else {
-          this.selectIndex = null;
+          randomRow.push(colorList[getRandomInt(colorList.length)])
         }
-        setSelect(val);
-        this.checkSelect(item);
-      };
-      item.el.addEventListener("mouseover", () => {
-        eventHandler(true);
-      });
-
-      item.el.addEventListener("mouseout", () => {
-        eventHandler(false);
-      });
-
-      this.menu.appendChild(item.el);
-    });
+      }
+      randomLevel.push(randomRow)
+      randomRow = []
+    }
+    return randomLevel
   }
 
   initLevel() {
-    this.level = new Level(levels[`level${this.currentLevel}`]);
+    this.levelScore = 0
+    if(this.gameModeIndex === 2) {
+      this.level = new Level(this.randomLevel());
+    } else {
+      this.level = new Level(levels[`level${this.currentLevel}`]);
+    }
     this.brick = new Brick();
 
     this.bricks = [];
@@ -183,9 +231,9 @@ export default class Game {
         }
       }
     }
-
-    this.paddle = new Paddle(this.context);
-    this.ball = new Ball(this.paddle);
+    
+    this.paddle = new Paddle(this.context, this.gameModeIndex);
+    this.ball = new Ball(this.paddle, this.gameModeIndex);
     this.sprites.paddle = new Image();
     this.sprites.paddle.src = this.paddle.sprite;
     this.sprites.ball = new Image();
@@ -205,17 +253,18 @@ export default class Game {
       this.wallSize,
       this.canvas.height
     );
-
+    
+    
     this.context.beginPath();
     this.bricks.forEach((brick: any) => {
       this.context.drawImage(brick.brickSprite, brick.x, brick.y);
     });
 
     this.context.beginPath();
-    this.context.drawImage(this.sprites.paddle, this.paddle.x, this.paddle.y);
+    this.context.drawImage(this.sprites.paddle, this.paddle.x, this.paddle.y, this.paddle.width, this.paddle.height);
 
     let hpCoords = 24;
-    for (let i = 0; i < this.paddle.hpCount; i++) {
+    for (let i = 1; i <= this.paddle.hpCount; i++) {
       this.context.beginPath();
       this.context.drawImage(
         this.sprites.hp,
@@ -228,7 +277,7 @@ export default class Game {
     }
 
     this.context.beginPath();
-    this.context.drawImage(this.sprites.ball, this.ball.x, this.ball.y);
+    this.context.drawImage(this.sprites.ball, this.ball.x, this.ball.y, this.ball.width, this.ball.height);
   }
 
   collides(obj1: any, obj2: any) {
@@ -240,13 +289,69 @@ export default class Game {
     );
   }
 
+  gameOver(isWinner: boolean = false) {
+    this.changeGameMode(4);
+    const totalScore = document.querySelector('#total-score') as HTMLElement
+    const levelScore = document.querySelector('#level-score') as HTMLElement
+    totalScore.innerHTML = this.totalScore.toString()
+    levelScore.innerHTML = this.levelScore.toString()
+    this.totalScore = 0
+
+    const gameOverGif = document.querySelector('.game-over-gif') as HTMLElement
+    const winnerText = document.querySelector('.game-over-winner') as HTMLElement
+
+    if(isWinner) {
+      gameOverGif.style.display = 'none'
+      winnerText.style.display = 'block'
+    } else {
+      gameOverGif.style.display = 'block'
+      winnerText.style.display = 'none'
+    }
+  }
+  menuHandler(menu: any, items: any, isGameOver: boolean = false) {
+    items.forEach((item: any, index: number) => {
+      item.el = document.createElement("div");
+      item.el.innerHTML = item.name;
+      item.el.classList.add("menu-item");
+      if (isGameOver) {
+        item.el.classList.add("menu-item--game-over");
+      }
+      item.el.addEventListener("click", () => {
+        item.event();
+      });
+
+      const setSelect = (val: boolean) => {
+        items[index].select = val;
+      };
+      const eventHandler = (val: boolean) => {
+        items.forEach((el: any) => {
+          el.select = false;
+          this.checkSelect(el);
+        });
+        if (val) {
+          this.selectIndex = index;
+        } else {
+          this.selectIndex = null;
+        }
+        setSelect(val);
+        this.checkSelect(item);
+      };
+      item.el.addEventListener("mouseover", () => {
+        eventHandler(true);
+      });
+
+      item.el.addEventListener("mouseout", () => {
+        eventHandler(false);
+      });
+
+      menu.appendChild(item.el);
+    });
+  }
   loop() {
     requestAnimationFrame(() => this.loop());
-
-    if (this.gameModeIndex === 1) {
+    if (this.gameModeIndex !== 0 && this.gameModeIndex !== 4) {
       this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
       this.createField();
-
       if (this.gameStatus) {
         this.paddle.x += this.paddle.dx;
 
@@ -279,16 +384,15 @@ export default class Game {
         }
 
         if (this.ball.y > this.canvas.height) {
-          this.paddle.reset(this.context);
-          this.ball = new Ball(this.paddle);
           this.gameStatus = false;
           this.paddle.hpCount--;
-
           if (this.paddle.hpCount < 1) {
-            this.changeGameMode(0);
-            this.gameStatus = false;
-            this.initLevel();
-            console.log("game over");
+            setTimeout(() => {
+              this.gameOver();
+            }, 10);
+          } else {
+            this.paddle.reset(this.context);
+            this.ball = new Ball(this.paddle, this.gameModeIndex);
           }
         }
 
@@ -302,7 +406,8 @@ export default class Game {
 
           if (this.collides(this.ball, brick)) {
             this.bricks.splice(i, 1);
-
+            this.levelScore++
+            this.totalScore++
             if (
               this.ball.y + this.ball.height - this.ball.speed <= brick.y ||
               this.ball.y >= brick.y + brick.height - this.ball.speed
@@ -314,11 +419,16 @@ export default class Game {
             break;
           }
         }
-
-        if (this.bricks.length <= 0) {
+        if (this.bricks.length <= 0 && this.currentLevel < Object.keys(levels).length) {
+          this.levelScore = 0
           this.gameStatus = false;
           this.currentLevel++;
           this.initLevel();
+        }
+        if(this.bricks.length <= 0 && this.currentLevel === Object.keys(levels).length) {
+          setTimeout(() => {
+            this.gameOver(true);
+          }, 10);
         }
       }
     }
