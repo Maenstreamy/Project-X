@@ -41,6 +41,7 @@ export default class Game {
       if (e.which === 27) {
         this.changeGameMode(0);
         this.gameStatus = false;
+        this.totalScore = 0
         this.initLevel();
       }
 
@@ -160,13 +161,17 @@ export default class Game {
       name: "Try Again",
       event: () => {
         this.currentLevel = 1
+        this.totalScore = 0
         this.changeGameMode(this.selectGameMode);
         this.initLevel();
       },
     },
     {
       name: "Main Menu",
-      event: () => this.changeGameMode(0),
+      event: () =>  {
+        this.totalScore = 0
+        this.changeGameMode(0)
+      },
     },
   ];
   selectIndex: any = null;
@@ -219,8 +224,7 @@ export default class Game {
           const colorCode: string = this.level.structure[row][col];
 
           const brickSprite = new Image();
-          brickSprite.src = `./../../assets/img/sprites/${this.level.colorMap[colorCode]}.png`;
-
+          brickSprite.src = `images/${this.level.colorMap[colorCode]}.png`;
           this.bricks.push({
             x: this.wallSize + (this.brick.width + this.brick.gap) * col,
             y: this.wallSize + (this.brick.heigth + this.brick.gap) * row,
@@ -348,6 +352,8 @@ export default class Game {
     });
   }
   loop() {
+    console.log(this.levelScore)
+    console.log(this.totalScore)
     requestAnimationFrame(() => this.loop());
     if (this.gameModeIndex !== 0 && this.gameModeIndex !== 4) {
       this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);

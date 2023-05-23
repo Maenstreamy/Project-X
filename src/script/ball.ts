@@ -8,7 +8,7 @@ export default class Ball {
     x: number;
     y: number;
     speed: number = 4;
-    sprite: string = './../../assets/img/sprites/ballGrey.png';
+    sprite: string = 'images/ballGrey.png';
 
     constructor(paddle: Paddle, gameModeIndex: number = 1) {
         if(gameModeIndex === 3) {

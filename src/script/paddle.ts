@@ -3,11 +3,11 @@ export default class Paddle {
     height: number = 24;
     dx: number = 0;
     speed: number = 5;
-    sprite: string = './../../assets/img/sprites/paddleRed.png';
+    sprite: string = 'images/paddleRed.png';
     x: number = 0;
     y: number = 0;
     hpCount: number = 3;
-    hpSprite: string = './../../assets/img/sprites/element_red_diamond_glossy.png'
+    hpSprite: string = 'images/element_red_diamond_glossy.png'
     hpWidth: number = 15;
     hpHeight: number = 15;
 
